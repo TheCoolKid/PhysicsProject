@@ -1,0 +1,158 @@
+package Calculation;
+
+import java.awt.Color;
+import java.util.ArrayList;
+
+import Main.Planet;
+
+public class Cal {
+	public static final double gravitationConstant = 6.67408*Math.pow(10, -11);
+	public static double ratio;
+	public static final int maxX = 1280;
+	public static final int maxY = 720;
+	public static void calcForce(ArrayList<Planet> planets){
+		for(int i = 0; i < planets.size(); i++){
+			for(int j = i + 1; j < planets.size(); j++){
+				double force = gravityForce(planets.get(i).mass, planets.get(j).mass, getDist(planets.get(i).xCord, planets.get(i).yCord,planets.get(j).xCord, planets.get(j).yCord));
+				double deg = findDeg(getDist(planets.get(i).xCord, planets.get(i).yCord,planets.get(j).xCord, planets.get(j).yCord), planets.get(i).yCord, planets.get(j).yCord);
+				double xForce = force*Math.cos(deg);
+				double yForce = force*Math.sin(deg);
+					if(planets.get(i).xCord < planets.get(j).xCord){
+						planets.get(i).xForce.add(xForce);
+						planets.get(j).xForce.add(-1*xForce);
+					}
+					else{
+						planets.get(i).xForce.add(-1*xForce);
+						planets.get(j).xForce.add(xForce);
+					}
+				
+					if(planets.get(i).yCord > planets.get(j).yCord){
+						planets.get(i).yForce.add(yForce);
+						planets.get(j).yForce.add(-1*yForce);
+					}
+					else{
+						planets.get(i).yForce.add(-1*yForce);
+						planets.get(j).yForce.add(yForce);
+					}
+			}
+			double sumX = 0;
+			double sumY = 0;
+			for(int j = 0; j < planets.get(i).xForce.size(); j++){
+				sumX += planets.get(i).xForce.get(j);
+				sumY += planets.get(i).yForce.get(j);
+			}
+			double sum = addXAndYForce(sumX,sumY);
+			planets.get(i).magNetF = sum;
+			double deg2 = Math.asin(Math.abs(sumY)/planets.get(i).magNetF);
+			if(sumX > 0 && sumY > 0){
+				planets.get(i).deg = deg2;
+				continue;
+			}
+			if(sumX < 0 && sumY > 0){
+				planets.get(i).deg =  Math.PI - deg2;
+				continue;
+			}
+			if(sumX < 0 && sumY < 0){
+				planets.get(i).deg = deg2 + Math.PI;
+				continue;
+			}
+			if(sumX > 0 && sumY < 0){
+				planets.get(i).deg =  Math.PI*2 - deg2;
+				continue;
+			}
+			if(sumX > 0 && sumY == 0){
+				planets.get(i).deg = 0;
+				continue;
+			}
+			if(sumX == 0  && sumY > 0){
+				planets.get(i).deg = Math.PI/2;
+				continue;
+			}
+			if(sumX < 0  && sumY == 0){
+				planets.get(i).deg = Math.PI;
+				continue;
+			}
+			if(sumX == 0  && sumY < 0){
+				planets.get(i).deg = Math.PI*3/2;
+				continue;
+			}
+			else{
+				planets.get(i).deg = -1;
+			}
+			
+		}
+	}
+	public static double findDeg(double hypo, double y1, double y2){
+		return Math.asin(Math.abs(y2 - y1)/hypo);
+	}
+	public static double getDist(double x1, double y1, double x2, double y2){
+		return Math.sqrt((y2 - y1)*(y2 - y1) + (x2 - x1)*(x2 - x1));
+		
+	}
+	public static Color getColor(String getColor){
+		switch(getColor.toLowerCase()){
+		case "pink":     
+			return Color.pink;    
+		case "blue":     
+			return Color.blue;    
+		case "green":     
+			return Color.green;    
+		case "cyan":     
+			return Color.cyan;    
+		case "gray":     
+			return Color.gray;    
+		case "magenta":     
+			return Color.magenta;     
+		case "orange":
+			return Color.orange;
+		case "red":
+			return Color.red;
+			
+		}
+		return null;
+	}
+	public static int getXCord(double cord){
+		return (int) (cord/ratio);
+	}
+	public static int getYCord(double cord){
+		return (int)(cord/ratio);
+		
+	}
+	public static double gravityForce(double m1, double m2, double distance){
+		return gravitationConstant*m1*m2/(distance*distance);
+	}
+	public static double radius(double volume){
+		return Math.sqrt(3*volume/(4*Math.PI));
+	}
+	public static double volume(double mass, double density){
+		return mass/density;
+		
+	}
+	public static double acceleration(double m, double f){
+		return f/m;
+	}
+	public static double RadtoDeg(double rad){
+		return rad/Math.PI*180;
+	}
+	public static double toRad(double deg){
+		return deg/180*Math.PI;
+	}
+//	public static double[] finalForce(ArrayList<Double> xs, ArrayList<Double> ys){
+//		double xf = 0;
+//		double yf = 0;
+//		for(int i = 0; i < xs.size(); i++){
+//			xf += xs.get(i);
+//			yf += ys.get(i);
+//		}
+//		
+//		return new double[]{Math.sqrt(xf*xf + yf*yf), toDeg(Math.atan(xf/yf))};
+//	}
+	public static double findVolume(double density, double mass){
+		return mass*density;
+	}
+	public static double addXAndYForce(double x, double y){
+		return Math.sqrt(x*x + y*y);
+		
+	}
+	
+}
