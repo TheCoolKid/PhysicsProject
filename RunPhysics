@@ -1,0 +1,143 @@
+package Main;
+
+import java.applet.Applet;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
+import Calculation.*;
+import Graphics.Draw;
+
+public class RunPhysics extends Applet{
+
+	boolean ready = false;
+	boolean ready2 = false;
+	int mode = 0;
+	int count = 0;
+	ArrayList<Planet> planets = new ArrayList<Planet>();
+//	public void paint(Graphics g) {
+//	    //Create Graphics2D object, cast g as a Graphics2D
+//	    Graphics2D g2d = (Graphics2D) g;
+//	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+//		ArrayList<Planet> planets = new ArrayList<Planet>();
+//		int inputValue = Integer.parseInt(JOptionPane.showInputDialog("Please input a value")); 
+//		planets.add(new Planet(inputValue,100,50,Color.BLUE));	
+//		Draw.drawPlanets(planets, (Graphics2D) g);
+//	}
+	public void paint(Graphics g) {
+	    //Create Graphics2D object, cast g as a Graphics2D
+	    resize(1280,720);
+	    count++;
+	    if(!ready && !ready2 && count == 3){
+	    	ready = true;
+	    	double ratio = Double.parseDouble(JOptionPane.showInputDialog("Enter the number of meters that a pixel represents."));
+	    	Cal.ratio = ratio;
+	    	int nPlanets = Integer.parseInt(JOptionPane.showInputDialog("Enter the number of planets"));
+	    	for(int i = 0; i < nPlanets;i++){
+	    		String[] p = JOptionPane.showInputDialog("Enter the following in this format(name of the planet, color of the planet, density of the planet in kg/(m^3), mass of the planet in kg, x-coordinate of the planet in meters, y-coordinate of the planet in meters)").split(", ");
+	    		Planet p2 = new Planet(p[0],p[1],p[2],p[3],p[4],p[5]);
+	    		planets.add(p2);
+	    	}
+	    	mode = Integer.parseInt(JOptionPane.showInputDialog("Enter 1 to show the net force or 2 to show the individual forces"));
+	    	ready2 = true;
+	    	Cal.calcForce(planets);
+	    }
+	    if(ready && ready2){
+	    	for(int i = 0; i < planets.size(); i++){
+	    		Planet p = planets.get(i);
+	    		g.setColor(p.getColor());
+	    		g.fillOval((int)(p.getxCord()-p.getRadius()), (int)(p.getyCord() - p.getRadius()), (int)(p.getRadius()*2), (int)(p.getRadius()*2));
+	    	}
+//	    	g.drawLine(100, 100, 160, 100);
+	    	if(mode ==1){
+//	    		Cal.calcForce(planets);
+	    		DecimalFormat format = new DecimalFormat("0.###E0");
+	    		g.setColor(Color.black);
+	    		for(int i = 0; i < planets.size(); i++){
+	    			if(planets.get(i).deg != -1){
+	    				System.out.println(planets.get(i).deg);
+	    				Draw.drawArrowLine(g, (int)(planets.get(i).xCord + planets.get(i).getRadius()*Math.cos(planets.get(i).deg)),(int)(planets.get(i).yCord - planets.get(i).getRadius()*Math.sin(planets.get(i).deg)) , (int)(planets.get(i).xCord + (planets.get(i).getRadius()+40)*Math.cos(planets.get(i).deg)),(int) (planets.get(i).yCord - (planets.get(i).getRadius()+40)*Math.sin(planets.get(i).deg)), 10, 10);
+	    				String out = format.format(planets.get(i).magNetF);
+	    				if(planets.get(i).deg <= Math.PI/2 || planets.get(i).deg >= Math.PI*3/2){
+	    					g.drawString(out + " N", (int) (planets.get(i).xCord + (planets.get(i).getRadius()+40)*Math.cos(planets.get(i).deg)) + 10, (int) (planets.get(i).yCord - (planets.get(i).getRadius()+40)*Math.sin(planets.get(i).deg)));
+	    				}
+	    				else{
+	    					g.drawString(out + " N", (int) (planets.get(i).xCord + (planets.get(i).getRadius()+40)*Math.cos(planets.get(i).deg)) - out.length()*9 - 9, (int) (planets.get(i).yCord - (planets.get(i).getRadius()+40)*Math.sin(planets.get(i).deg)));
+	    				}
+	    			}
+	    		}
+	    	}
+	    	if(mode == 2){
+	    		DecimalFormat format = new DecimalFormat("0.###E0");
+	    		g.setColor(Color.black);
+	    		for(int i = 0; i < planets.size(); i++){
+	    			for(int j = 0; j < planets.get(i).xForce.size(); j++){
+	    				double sum = Cal.addXAndYForce( planets.get(i).xForce.get(j),planets.get(i).yForce.get(j));
+	    				double deg = -1;
+	    				deg = Math.asin(Math.abs(planets.get(i).yForce.get(j))/sum);
+	    				if(planets.get(i).xForce.get(j) > 0 && planets.get(i).yForce.get(j) > 0){
+	    					
+	    				}
+	    				else if(planets.get(i).xForce.get(j) < 0 && planets.get(i).yForce.get(j) > 0){
+	    					deg = Math.PI - deg;
+	    				}
+	    				else if(planets.get(i).xForce.get(j) < 0 && planets.get(i).yForce.get(j) < 0){
+	    					deg += Math.PI;
+	    					
+	    				}
+	    				else if(planets.get(i).xForce.get(j) > 0 && planets.get(i).yForce.get(j) < 0){
+	    					deg = Math.PI*2 - deg;
+	    					
+	    				}
+	    				else if(planets.get(i).xForce.get(j) > 0 && planets.get(i).yForce.get(j) == 0){
+	    					deg = 0;
+	    					
+	    				}
+	    				else if(planets.get(i).xForce.get(j) == 0  && planets.get(i).yForce.get(j) > 0){
+	    					deg = Math.PI/2;
+	    					
+	    				}
+	    				else if(planets.get(i).xForce.get(j) < 0  && planets.get(i).yForce.get(j) == 0){
+	    					deg = Math.PI;
+	    					
+	    				}
+	    				else if(planets.get(i).xForce.get(j) == 0  && planets.get(i).yForce.get(j) < 0){
+	    					deg = Math.PI*3/2;
+	    					
+	    				}
+	    				else{
+	    					deg = -1;
+	    				}
+	    				if(deg != -1){
+	    					System.out.println(deg);
+		    				Draw.drawArrowLine(g, (int)(planets.get(i).xCord + planets.get(i).getRadius()*Math.cos(deg)),(int)(planets.get(i).yCord - planets.get(i).getRadius()*Math.sin(deg)) , (int)(planets.get(i).xCord + (planets.get(i).getRadius()+40)*Math.cos(deg)),(int) (planets.get(i).yCord - (planets.get(i).getRadius()+40)*Math.sin(deg)), 10, 10);
+		    				String out = format.format(sum);
+		    				if(deg <= Math.PI/2 || deg >= Math.PI*3/2){
+		    					g.drawString(out + " N", (int) (planets.get(i).xCord + (planets.get(i).getRadius()+40)*Math.cos(deg)) + 10, (int) (planets.get(i).yCord - (planets.get(i).getRadius()+40)*Math.sin(deg)));
+		    				}
+		    				else{
+		    					g.drawString(out + " N", (int) (planets.get(i).xCord + (planets.get(i).getRadius()+40)*Math.cos(deg)) - out.length()*9- 9, (int) (planets.get(i).yCord - (planets.get(i).getRadius()+40)*Math.sin(deg)) - 5);
+		    				}
+		    			}
+	    			}
+	    		}
+	    	}
+	    }
+	    
+	    
+	}
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+
+
+}
