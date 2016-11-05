@@ -1,0 +1,55 @@
+package Main;
+
+import java.awt.Color;
+import java.util.ArrayList;
+
+import Calculation.Cal;
+import Graphics.*;
+public class Planet {
+
+	public int xCord;
+	public int yCord;
+	private double radius;
+	private Color color;
+	private String name;
+	public  double mass;
+	public ArrayList<Double> xForce;
+	public ArrayList<Double> yForce;
+	public double magNetF;
+	public double deg;
+	public Planet(String name,String color,String density, String mass ,String xCord, String yCord){
+		this.name = name;
+		this.color = Cal.getColor(color);
+		this.radius = Cal.radius(Cal.volume(Double.parseDouble(mass), Double.parseDouble(density)));
+		this.mass = Double.parseDouble(density);
+		this.xCord = Cal.getXCord(Double.parseDouble(xCord));
+		this.yCord = Cal.getYCord(Double.parseDouble(yCord));
+		xForce = new ArrayList<Double>();
+		yForce = new ArrayList<Double>();
+		deg = -1;
+	}
+	public int getxCord() {
+		return xCord;
+	}
+	public void setxCord(int xCord) {
+		this.xCord = xCord;
+	}
+	public int getyCord() {
+		return yCord;
+	}
+	public void setyCord(int yCord) {
+		this.yCord = yCord;
+	}
+	public double getRadius() {
+		return radius;
+	}
+	public void setDiameter(double radius) {
+		this.radius = radius;
+	}
+	public Color getColor() {
+		return color;
+	}
+	public void setColor(Color color) {
+		this.color = color;
+	}
+}
